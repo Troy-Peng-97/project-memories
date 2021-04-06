@@ -1,4 +1,5 @@
 // a reducer is a function
+// combined this function with the reducer;
 
 import Posts from "../components/Posts/Posts";
 
@@ -7,7 +8,7 @@ export default (posts = [], action) => {
         case 'FETCH_ALL':
             return action.payload;
         case 'CREATE':
-            return Posts;
+            return [...posts, action.payload];
         default:
             return Posts;
     }
