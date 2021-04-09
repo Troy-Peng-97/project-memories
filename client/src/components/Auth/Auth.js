@@ -6,20 +6,37 @@ import useStyles from './styles';
 import Icon from './icon';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { useDispatch } from 'react-redux';
-import { useHistory }from 'react-router-dom';
-
+import { useHistory, Redirect }from 'react-router-dom';
+import { signup, signin } from '../../actions/auth';
 const Auth = () => {
+    const initialState = { firstName: ' ', lastName: ' ', email: ' ', password: ' ', confirmPassword: ' '};
     const dispatch = useDispatch();
     const history = useHistory();
     const classes = useStyles();
     const [showPassword, setShowPassword] = useState(false);
     const [isSignup, setIsSignup] = useState(false);
+    const [formData, setFormData] = useState(initialState);
+    const [rightCredential, setRightCredential] = useState(true);
     const handleShowPassword = () => setShowPassword((prevShowPassword) => !prevShowPassword);
-    const handleChange = () => {
-
+    const handleChange = (e) => {
+        setFormData( { ...formData, [e.target.name]: e.target.value });
+        if (!isSignup){
+            setRightCredential(true);
+        }
+        else {
+            if (e.target.name === "email"){
+                setRightCredential(true);
+            }
+        }
     }
-    const handleSubmit = () => {
-
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (isSignup){
+            dispatch(signup(formData, history, setRightCredential));
+        }
+        else {
+            dispatch(signin(formData, history, setRightCredential));
+        }
     }
 
     const googleSuccess = async (res) => {
@@ -39,28 +56,54 @@ const Auth = () => {
 
     const switchMode = () => {
         setIsSignup((prevIsSignUp) => !prevIsSignUp);
-        handleShowPassword(false);
+        setShowPassword(false);
+        setRightCredential(true);
     }
+    const redirect = () => {
+        history.push('/');
+    }
+    if (localStorage.getItem('profile')){
+       return ( <Redirect to='/' /> )
+    }
+  
     return (
         <Container component="main" maxWidth="xs">
             <Paper className={classes.paper} elevation={3}>
                 <Avatar className={classes.avatar}>
                     <LockOutlinedIcon />
                 </Avatar>
-                <Typography variant="h5">{isSignup ? 'Sign up' : 'Sign in' }</Typography>
+                <Typography variant="h5">{isSignup ? 'Sign Up' : 'Sign In' }</Typography>
                 <form className={classes.form} onSubmit={handleSubmit}>
                     <Grid container spacing={2}>
                         { isSignup && (
                         <>
                             <Input name="firstName" label="First Name" handleChange={handleChange} autoFocus half/>
-                            <Input name="firstName" label="First Name" handleChange={handleChange} half/>
+                            <Input name="lastName" label="Last Name" handleChange={handleChange} half/>
                         </>
                         )}
                         <Input name="email" label="Email Address" handleChange={handleChange} type="email"/>
                         <Input name="password" label="Password" handleChange={handleChange} type={showPassword ? "text" : "password"} handleShowPassword={handleShowPassword} />
                         { isSignup && <Input name="confirmPassword" label="Repeat Password" handleChange={handleChange} type="password"/>}
+                        { isSignup && formData.password !== formData.confirmPassword &&
+                            <Grid container justify="flex-end">
+                                <Grid item >
+                                    <i className={classes.invalidCredential}>
+                                        Passwords do not match!
+                                    </i>
+                                </Grid>
+                            </Grid>
+                        }
+                        { !rightCredential && <Grid container justify="flex-end">
+                            <Grid item >
+                                <i className={classes.invalidCredential}>
+                                    {!isSignup ? 
+                                    "Invalid Credentials!" : "User already exist!"
+                                    }
+                                </i>
+                            </Grid>
+                        </Grid>}
                     </Grid>
-                    <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>{isSignup ? 'Sign up' : 'Sign In'}</Button>
+                    <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit} disabled={(isSignup && formData.password !== formData.confirmPassword)}>{isSignup ? 'Sign up' : 'Sign In'}</Button>
                     <GoogleLogin 
                         clientId="777136393433-8lfhqrba34cman0vrm6r6jqupcqrfg30.apps.googleusercontent.com"
                         render={(renderProps) => (
@@ -72,6 +115,9 @@ const Auth = () => {
                         OnFailure={googleFailure}
                         cookiePolicy="single_host_origin"
                     />
+                    <Button className={classes.guest} variant="contained" fullWidth onClick={redirect}>
+                        Continue without Sign In
+                    </Button>
                     <Grid container justify="flex-end">
                         <Grid item>
                             <Button onClick={switchMode}>

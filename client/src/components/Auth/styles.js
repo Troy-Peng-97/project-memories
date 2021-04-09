@@ -27,4 +27,15 @@ export default makeStyles((theme) => ({
   googleButton: {
     marginBottom: theme.spacing(2),
   },
+  invalidCredential: {
+    color: 'red',
+  },
+  guest: {
+    backgroundColor: "#34eb8f",
+    color: "white",
+    "&:hover": {
+      //you want this to be the same as the backgroundColor above
+      backgroundColor: "green",
+    }
+  },
 }));
