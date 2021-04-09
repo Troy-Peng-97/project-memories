@@ -16,7 +16,7 @@ const Post = ({ post, setCurrentId }) => {
   const user = JSON.parse(localStorage.getItem('profile'));
   // correct the render of like/likes
   const Likes = () => {
-    if (post.likeCount.length > 0) {
+    if (post?.likeCount?.length > 0) {
       return post.likeCount.find((like) => like === (user?.result?.googleId || user?.result?._id))
         ? (
           <><ThumbUpAltIcon fontSize="small" />&nbsp;{post.likeCount.length > 2 ? `You and ${post.likeCount.length - 1} others` : `${post.likeCount.length} like${post.likeCount.length > 1 ? 's' : ''}` }</>
