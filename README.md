@@ -7,7 +7,8 @@ Sign up and sign in as soon as possible! Or, just sign in with your google accou
 **Live Link**: http://treasure-memories.netlify.app/
 
 
-![Memories](memories.jpg)
+![Memories](Overview.png)
+![Details](Details.png)
 ![Authentication-SignIn](authentication-signin.jpg)
 ![Authentication-SignUp](authentication-signup.jpg)
 
